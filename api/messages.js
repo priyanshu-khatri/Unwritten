@@ -1,40 +1,4 @@
-/**
- * /api/messages
- * Vercel Serverless Function
- *
- * DATABASE OPTIONS (pick one — see README):
- *  A) Vercel KV (Redis)  ← default below, free tier available
- *  B) Supabase (Postgres) ← uncomment the supabase block
- *  C) MongoDB Atlas       ← uncomment the mongo block
- *
- * Set your env vars in Vercel Dashboard → Project → Settings → Environment Variables
- */
-
-// ── Option A: Vercel KV (Redis) ──────────────────────────────────────────────
-// Add KV to your Vercel project: vercel.com/dashboard → Storage → Create KV
-import { kv } from '@vercel/kv';
-
-// ── Option B: Supabase ───────────────────────────────────────────────────────
-// npm install @supabase/supabase-js
-// import { createClient } from '@supabase/supabase-js';
-// const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-
-// ── Option C: MongoDB Atlas ──────────────────────────────────────────────────
-// npm install mongodb
-// import { MongoClient } from 'mongodb';
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-const SEED_MESSAGES = [
-  { name: "you", text: "I still have the voicemail you left the night we met. I've never been able to delete it.", color: "#c084fc", colorName: "Soft Violet", mood: "longing", hearts: 84 },
-  { name: "first love", text: "I googled your name last year. You have a daughter now. I hope she has your laugh.", color: "#f97316", colorName: "Warm Ember", mood: "bittersweet", hearts: 112 },
-  { name: "dad", text: "I forgave you a long time ago. I just never got the chance to tell you before you were gone.", color: "#64748b", colorName: "Storm Gray", mood: "grief", hearts: 203 },
-  { name: "M", text: "You were right. I knew you were right that night and I was too stubborn to say so. I'm sorry.", color: "#2dd4bf", colorName: "Sea Glass", mood: "regret", hearts: 67 },
-  { name: "stranger on the train", text: "You were reading my favorite book. I almost said something. I think about that sometimes.", color: "#a3e635", colorName: "Spring", mood: "wonder", hearts: 145 },
-  { name: "you know who you are", text: "I'm doing okay. Better than okay, actually. I just wanted you to know that.", color: "#fbbf24", colorName: "Golden Hour", mood: "hope", hearts: 98 },
-  { name: "her", text: "Every love song I've ever listened to was about you. You just didn't know it.", color: "#f43f5e", colorName: "Rose Red", mood: "love", hearts: 234 },
-  { name: "the version of me at 17", text: "It gets better. Not easier exactly — but richer. You'll understand what I mean someday.", color: "#fb923c", colorName: "Tangerine", mood: "hope", hearts: 189 },
-];
+import { SEED_MESSAGES } from './_seed.js'; // We will create this helper file next
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -52,9 +16,10 @@ function validate(body) {
 
 async function getMessages() {
   try {
+    // Dynamically require KV so it doesn't crash the file if the DB isn't set up yet
+    const { kv } = await import('@vercel/kv');
     const data = await kv.get('unwritten:messages');
     if (!data || data.length === 0) {
-      // Seed on first run
       const seeded = SEED_MESSAGES.map(m => ({
         ...m, id: genId(),
         createdAt: new Date(Date.now() - Math.floor(Math.random() * 30*24*60*60*1000)).toISOString()
@@ -64,23 +29,26 @@ async function getMessages() {
     }
     return data;
   } catch (e) {
-    // KV not connected yet — return seed data in memory
+    // If Vercel KV is not connected or fails, fallback safely to local memory
     return SEED_MESSAGES.map(m => ({ ...m, id: genId(), createdAt: new Date().toISOString() }));
   }
 }
 
 async function saveMessages(msgs) {
-  await kv.set('unwritten:messages', msgs);
+  try {
+    const { kv } = await import('@vercel/kv');
+    await kv.set('unwritten:messages', msgs);
+  } catch (e) {
+    console.log("Database not connected. Message saved to temporary runtime memory.");
+  }
 }
 
-// ─── Handler ─────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // GET /api/messages
   if (req.method === 'GET') {
     let msgs = await getMessages();
     const { sort = 'newest', color, mood, q, page = '0', limit = '12' } = req.query;
@@ -107,7 +75,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // POST /api/messages
   if (req.method === 'POST') {
     const error = validate(req.body);
     if (error) return res.status(400).json({ error });

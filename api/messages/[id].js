@@ -2,13 +2,25 @@
  * /api/messages/[id]
  * Handles: GET, DELETE, and heart toggling via POST /api/messages/[id]/heart
  */
-import { kv } from '@vercel/kv';
 
 async function getMessages() {
-  return (await kv.get('unwritten:messages')) || [];
+  try {
+    const { kv } = await import('@vercel/kv');
+    return (await kv.get('unwritten:messages')) || [];
+  } catch (e) {
+    // Return empty array fallback if database isn't bound yet
+    console.warn("Vercel KV not connected while trying to read a specific message ID.");
+    return [];
+  }
 }
+
 async function saveMessages(msgs) {
-  await kv.set('unwritten:messages', msgs);
+  try {
+    const { kv } = await import('@vercel/kv');
+    await kv.set('unwritten:messages', msgs);
+  } catch (e) {
+    console.error("Failed to write to database. Is Vercel KV connected?");
+  }
 }
 
 export default async function handler(req, res) {
@@ -20,6 +32,7 @@ export default async function handler(req, res) {
   const { id } = req.query;
   const msgs = await getMessages();
   const idx = msgs.findIndex(m => m.id === id);
+  
   if (idx === -1) return res.status(404).json({ error: 'Message not found' });
 
   if (req.method === 'GET') {
