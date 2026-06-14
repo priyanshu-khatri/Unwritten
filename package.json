@@ -1,0 +1,16 @@
+{
+  "name": "unwritten",
+  "version": "1.0.0",
+  "description": "Unwritten — Anonymous unsent messages archive",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

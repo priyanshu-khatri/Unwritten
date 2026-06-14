@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unwritten — Messages Never Sent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --bg2: #161616;
+    --bg3: #1f1f1f;
+    --surface: #242424;
+    --surface2: #2c2c2c;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0ede8;
+    --text2: rgba(240,237,232,0.6);
+    --text3: rgba(240,237,232,0.35);
+    --accent: #d4af8c;
+    --accent2: #a07850;
+    --heart: #c0506a;
+    --card-radius: 12px;
+    --tag-radius: 20px;
+    --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  [data-theme="light"] {
+    --bg: #f7f5f2;
+    --bg2: #eeeae4;
+    --bg3: #e5e0d8;
+    --surface: #ffffff;
+    --surface2: #f0ece6;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1714;
+    --text2: rgba(26,23,20,0.6);
+    --text3: rgba(26,23,20,0.35);
+    --accent: #8b5e3c;
+    --accent2: #6b4020;
+    --heart: #c0506a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    transition: background var(--transition), color var(--transition);
+  }
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 60px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    transition: background var(--transition);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem; font-weight: 400; letter-spacing: 0.04em;
+    color: var(--text); text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+  .nav-btn {
+    background: none; border: 1px solid var(--border2); color: var(--text2);
+    padding: 0.45rem 1rem; border-radius: 20px; cursor: pointer;
+    font-size: 0.8rem; letter-spacing: 0.06em; font-family: 'Inter', sans-serif;
+    transition: all var(--transition);
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn.primary {
+    background: var(--accent); border-color: var(--accent);
+    color: var(--bg); font-weight: 500;
+  }
+  .nav-btn.primary:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .theme-toggle {
+    background: none; border: 1px solid var(--border2); color: var(--text2);
+    width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition);
+  }
+  .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  /* HERO */
+  .hero {
+    padding: 140px 2rem 80px;
+    text-align: center; max-width: 700px; margin: 0 auto;
+  }
+  .hero-eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.5rem; font-weight: 400;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    font-weight: 400; line-height: 1.1;
+    margin-bottom: 1.5rem; letter-spacing: -0.01em;
+  }
+  .hero h1 em { font-style: italic; color: var(--accent); }
+  .hero p {
+    color: var(--text2); font-size: 1.05rem; line-height: 1.8;
+    margin-bottom: 2.5rem; max-width: 500px; margin-inline: auto;
+  }
+  .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    font-family: 'Inter', sans-serif; cursor: pointer; border: none;
+    padding: 0.75rem 2rem; border-radius: 30px; font-size: 0.9rem;
+    letter-spacing: 0.04em; transition: all var(--transition); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-primary { background: var(--accent); color: var(--bg); font-weight: 500; }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+  .btn-ghost {
+    background: none; border: 1px solid var(--border2); color: var(--text2);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  /* STATS */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 3rem;
+    padding: 2rem; border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif; font-size: 2rem;
+    color: var(--text); display: block;
+  }
+  .stat-label { font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; }
+  /* FILTER BAR */
+  .filter-section {
+    max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem 1rem;
+  }
+  .filter-row {
+    display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;
+  }
+  .search-wrap {
+    flex: 1; min-width: 200px; position: relative;
+  }
+  .search-wrap svg {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text3); pointer-events: none;
+  }
+  .search-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 0.65rem 1rem 0.65rem 2.5rem;
+    color: var(--text); font-size: 0.9rem; font-family: 'Inter', sans-serif;
+    transition: all var(--transition); outline: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+  .sort-select {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 0.65rem 1.2rem;
+    color: var(--text2); font-size: 0.85rem; font-family: 'Inter', sans-serif;
+    cursor: pointer; outline: none;
+    transition: border-color var(--transition);
+  }
+  .sort-select:focus { border-color: var(--accent); }
+  .color-filters {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;
+  }
+  .color-filter-label { font-size: 0.75rem; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-right: 0.25rem; }
+  .color-dot {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: all var(--transition);
+    flex-shrink: 0;
+  }
+  .color-dot:hover, .color-dot.active { border-color: var(--text); transform: scale(1.15); }
+  .color-dot.all { background: conic-gradient(red, orange, yellow, green, blue, violet, red); }
+  /* MASONRY GRID */
+  .messages-grid {
+    max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem;
+    columns: 3; column-gap: 1.25rem;
+  }
+  @media (max-width: 900px) { .messages-grid { columns: 2; } }
+  @media (max-width: 560px) { .messages-grid { columns: 1; } }
+  .msg-card {
+    break-inside: avoid; margin-bottom: 1.25rem;
+    border-radius: var(--card-radius); overflow: hidden;
+    cursor: pointer; position: relative;
+    transition: transform var(--transition), box-shadow var(--transition);
+    display: block;
+  }
+  .msg-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+  .msg-card-inner {
+    padding: 1.6rem; min-height: 130px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .msg-name {
+    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 0.8rem; opacity: 0.7; font-weight: 400;
+  }
+  .msg-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem; line-height: 1.65; flex: 1;
+    word-break: break-word;
+  }
+  .msg-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 1rem;
+  }
+  .msg-color-tag {
+    font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+    opacity: 0.6; font-weight: 400;
+  }
+  .msg-heart {
+    background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; gap: 0.3rem;
+    font-size: 0.8rem; opacity: 0.6; transition: all var(--transition);
+    font-family: 'Inter', sans-serif;
+    padding: 0.25rem 0.5rem; border-radius: 12px;
+  }
+  .msg-heart:hover, .msg-heart.liked { opacity: 1; color: var(--heart); }
+  .msg-heart.liked .heart-icon { transform: scale(1.2); }
+  .heart-icon { transition: transform 0.15s ease; display: inline-block; }
+  /* LOAD MORE */
+  .load-more-wrap { text-align: center; padding: 1rem 0 3rem; }
+  /* MODAL OVERLAY */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: 18px; padding: 2.5rem; width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+    animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.92) translateY(12px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 1.75rem;
+  }
+  .modal-title {
+    font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 400;
+  }
+  .modal-title em { font-style: italic; color: var(--accent); }
+  .modal-close {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 1.4rem; line-height: 1; padding: 0.25rem;
+    transition: color var(--transition);
+  }
+  .modal-close:hover { color: var(--text); }
+  .form-group { margin-bottom: 1.4rem; }
+  .form-label {
+    display: block; font-size: 0.75rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 0.6rem;
+  }
+  .form-input, .form-textarea {
+    width: 100%; background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.8rem 1rem; color: var(--text);
+    font-size: 0.95rem; font-family: 'Inter', sans-serif; outline: none;
+    transition: border-color var(--transition);
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--accent); }
+  .form-textarea {
+    font-family: 'Playfair Display', serif; font-size: 1.05rem;
+    min-height: 140px; resize: vertical; line-height: 1.7;
+  }
+  .form-textarea::placeholder, .form-input::placeholder { color: var(--text3); }
+  .color-picker-grid {
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 0.5rem;
+  }
+  .color-swatch {
+    aspect-ratio: 1; border-radius: 50%; cursor: pointer;
+    border: 3px solid transparent; transition: all var(--transition);
+  }
+  .color-swatch:hover, .color-swatch.selected {
+    border-color: var(--text); transform: scale(1.1);
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text);
+  }
+  .color-name-preview {
+    font-size: 0.8rem; color: var(--text2); margin-top: 0.6rem; min-height: 1.2em;
+  }
+  .char-count { font-size: 0.75rem; color: var(--text3); text-align: right; margin-top: 0.3rem; }
+  .char-count.warn { color: #e08060; }
+  .mood-select-grid {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+  }
+  .mood-tag {
+    padding: 0.4rem 0.9rem; border-radius: var(--tag-radius);
+    border: 1px solid var(--border); font-size: 0.8rem; cursor: pointer;
+    background: none; color: var(--text2); font-family: 'Inter', sans-serif;
+    transition: all var(--transition);
+  }
+  .mood-tag:hover { border-color: var(--accent); color: var(--accent); }
+  .mood-tag.selected { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .submit-btn {
+    width: 100%; padding: 0.9rem; background: var(--accent); border: none;
+    border-radius: 30px; color: var(--bg); font-size: 0.95rem; font-weight: 500;
+    letter-spacing: 0.04em; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: all var(--transition); margin-top: 0.5rem;
+  }
+  .submit-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  /* READ MODAL */
+  .read-modal {
+    max-width: 480px; text-align: center;
+  }
+  .read-modal-color {
+    width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 1.5rem;
+  }
+  .read-modal-name {
+    font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text2); margin-bottom: 0.75rem;
+  }
+  .read-modal-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem; line-height: 1.7; color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .read-modal-meta {
+    display: flex; justify-content: center; gap: 1.5rem;
+    font-size: 0.8rem; color: var(--text3);
+  }
+  .read-modal-meta span { display: flex; align-items: center; gap: 0.3rem; }
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(4rem);
+    background: var(--surface); border: 1px solid var(--border2);
+    padding: 0.75rem 1.5rem; border-radius: 30px; font-size: 0.9rem;
+    color: var(--text); z-index: 300; opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center; padding: 4rem 2rem; color: var(--text3);
+    grid-column: 1/-1;
+  }
+  .empty-state p { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-style: italic; margin-bottom: 0.5rem; }
+  /* SCROLL TOP */
+  .scroll-top {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 100;
+    width: 42px; height: 42px; border-radius: 50%; background: var(--accent);
+    border: none; color: var(--bg); cursor: pointer; font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all var(--transition); pointer-events: none;
+  }
+  .scroll-top.visible { opacity: 1; pointer-events: auto; }
+  .scroll-top:hover { background: var(--accent2); transform: translateY(-2px); }
+  /* PREVIEW CARD in submit */
+  .preview-card {
+    border-radius: 10px; padding: 1.2rem 1.4rem; margin-top: 0.75rem;
+    min-height: 80px; transition: background 0.3s;
+  }
+  .preview-card .preview-name { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin-bottom: 0.5rem; }
+  .preview-card .preview-text { font-family: 'Playfair Display', serif; font-size: 1rem; line-height: 1.6; opacity: 0.9; font-style: italic; }
+  /* ABOUT */
+  .about-section {
+    max-width: 680px; margin: 0 auto; padding: 5rem 2rem;
+    text-align: center; border-top: 1px solid var(--border);
+  }
+  .about-section h2 {
+    font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 400;
+    margin-bottom: 1.25rem;
+  }
+  .about-section p { color: var(--text2); line-height: 1.9; font-size: 0.95rem; }
+  footer {
+    text-align: center; padding: 2rem;
+    border-top: 1px solid var(--border); color: var(--text3);
+    font-size: 0.8rem; letter-spacing: 0.06em;
+  }
+  .loading-spinner {
+    display: flex; justify-content: center; padding: 3rem;
+    gap: 8px; align-items: center;
+  }
+  .loading-spinner span {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: bounce 1.2s ease infinite;
+  }
+  .loading-spinner span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-spinner span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+  .tag-mood {
+    display: inline-block; padding: 0.2rem 0.7rem; border-radius: 12px;
+    font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    background: rgba(255,255,255,0.1); color: var(--text2); margin-top: 0.5rem;
+  }
+  [data-theme="light"] .tag-mood { background: rgba(0,0,0,0.08); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Un<span>written</span></a>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+    <button class="nav-btn" onclick="openReadModal(null, true)">Browse</button>
+    <button class="nav-btn primary" onclick="openSubmitModal()">Share yours</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">An anonymous archive of unsent words</p>
+  <h1>The things we never <em>dared</em> to say</h1>
+  <p>A collection of messages written but never sent — to first loves, lost friends, the ones who stayed too long, and the ones who left too soon. What color is your unspoken feeling?</p>
+  <div class="hero-actions">
+    <button class="btn btn-primary" onclick="openSubmitModal()">Leave a message</button>
+    <button class="btn btn-ghost" onclick="document.getElementById('messages').scrollIntoView({behavior:'smooth'})">Read the archive ↓</button>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-num" id="statTotal">—</span>
+    <span class="stat-label">messages</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num" id="statColors">—</span>
+    <span class="stat-label">colors</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num" id="statHearts">—</span>
+    <span class="stat-label">hearts given</span>
+  </div>
+</div>
+
+<!-- FILTER -->
+<section id="messages" class="filter-section">
+  <div class="filter-row">
+    <div class="search-wrap">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" type="text" id="searchInput" placeholder="Search messages…" oninput="handleSearch()">
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="loadMessages()">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="most-loved">Most loved</option>
+      <option value="random">Random</option>
+    </select>
+  </div>
+  <div class="filter-row">
+    <span class="color-filter-label">Filter by color:</span>
+    <div class="color-filters" id="colorFilters"></div>
+  </div>
+</section>
+
+<!-- MESSAGES GRID -->
+<div class="messages-grid" id="messagesGrid">
+  <div class="loading-spinner"><span></span><span></span><span></span></div>
+</div>
+<div class="load-more-wrap" id="loadMoreWrap" style="display:none">
+  <button class="btn btn-ghost" onclick="loadMore()">Load more messages</button>
+</div>
+
+<!-- ABOUT -->
+<section class="about-section">
+  <h2>About Unwritten</h2>
+  <p>Every day, millions of messages are typed and deleted, feelings that never find their way. Unwritten is an anonymous archive for these unsent words — the confessions, apologies, love letters, and goodbyes that lived only on a screen. Submit yours anonymously. Read others. Feel less alone.</p>
+</section>
+
+<footer>
+  Unwritten — A space for unspoken words &nbsp;·&nbsp; Anonymous, always
+</footer>
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submitModal" onclick="if(event.target===this)closeSubmitModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Share the <em>unsent</em></h2>
+      <button class="modal-close" onclick="closeSubmitModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">To whom?</label>
+      <input class="form-input" type="text" id="submitName" placeholder="e.g. You, M, my first love…" maxlength="40">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your message</label>
+      <textarea class="form-textarea" id="submitText" placeholder="What did you never say?" maxlength="500" oninput="updatePreview(); updateCharCount()"></textarea>
+      <div class="char-count" id="charCount">0 / 500</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">What color is this feeling?</label>
+      <div class="color-picker-grid" id="colorPickerGrid"></div>
+      <div class="color-name-preview" id="colorNamePreview">Choose a color that matches your feeling</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mood</label>
+      <div class="mood-select-grid" id="moodGrid"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Preview</label>
+      <div class="preview-card" id="previewCard">
+        <div class="preview-name" id="previewName">To: —</div>
+        <div class="preview-text" id="previewText">Your message will appear here…</div>
+      </div>
+    </div>
+    <button class="submit-btn" id="submitBtn" onclick="submitMessage()">Send it into the archive</button>
+  </div>
+</div>
+
+<!-- READ MODAL -->
+<div class="modal-overlay" id="readModal" onclick="if(event.target===this)closeReadModal()">
+  <div class="modal read-modal">
+    <div class="modal-header" style="justify-content:flex-end">
+      <button class="modal-close" onclick="closeReadModal()">✕</button>
+    </div>
+    <div class="read-modal-color" id="readModalColor"></div>
+    <p class="read-modal-name" id="readModalName"></p>
+    <p class="read-modal-text" id="readModalText"></p>
+    <div style="margin-bottom:1rem;text-align:center">
+      <span id="readModalMood" class="tag-mood" style="display:none"></span>
+    </div>
+    <div class="read-modal-meta">
+      <span id="readModalDate">📅</span>
+      <span id="readModalColor2">🎨</span>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <button class="btn btn-ghost" id="readModalHeart" onclick="toggleHeartFromModal()">♡ <span id="readModalHeartCount">0</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ═══════════════════════════════════════
+// API CLIENT — talks to /api/* endpoints
+// Falls back to IndexedDB if API fails
+// ═══════════════════════════════════════
+const API = {
+  async getMessages(params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    const r = await fetch(`/api/messages${qs ? '?' + qs : ''}`);
+    if (!r.ok) throw new Error('API error');
+    return r.json();
+  },
+  async postMessage(body) {
+    const r = await fetch('/api/messages', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.error || 'API error'); }
+    return r.json();
+  },
+  async heart(id, action) {
+    const r = await fetch(`/api/messages/${id}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action })
+    });
+    if (!r.ok) throw new Error('API error');
+    return r.json();
+  },
+  async stats() {
+    const r = await fetch('/api/stats');
+    if (!r.ok) throw new Error('API error');
+    return r.json();
+  }
+};
+
+// ═══════════════════════════════════════
+// COLOR PALETTE
+// ═══════════════════════════════════════
+const COLORS = [
+  { hex: "#ef4444", name: "Scarlet" }, { hex: "#f97316", name: "Warm Ember" },
+  { hex: "#fbbf24", name: "Golden Hour" }, { hex: "#a3e635", name: "Spring" },
+  { hex: "#4ade80", name: "Leaf" }, { hex: "#34d399", name: "Sage" },
+  { hex: "#22d3ee", name: "Electric Teal" }, { hex: "#38bdf8", name: "Sky Blue" },
+  { hex: "#818cf8", name: "Periwinkle" }, { hex: "#c084fc", name: "Soft Violet" },
+  { hex: "#e879f9", name: "Lilac" }, { hex: "#f43f5e", name: "Rose Red" },
+  { hex: "#fb7185", name: "Blush" }, { hex: "#a78bfa", name: "Mauve" },
+  { hex: "#2dd4bf", name: "Sea Glass" }, { hex: "#fb923c", name: "Tangerine" },
+  { hex: "#64748b", name: "Storm Gray" }, { hex: "#94a3b8", name: "Dusk" },
+  { hex: "#d4a76a", name: "Caramel" }, { hex: "#ffffff", name: "Moonlight" },
+  { hex: "#1e293b", name: "Midnight" }, { hex: "#7f1d1d", name: "Deep Burgundy" },
+  { hex: "#164e63", name: "Ocean Deep" }, { hex: "#f0abfc", name: "Cotton Candy" },
+];
+const MOODS = ["love","longing","regret","hope","grief","wonder","bittersweet","gratitude","anger","nostalgia","relief","confusion"];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let selectedColor = null;
+let selectedMood = null;
+let filterColor = null;
+let currentPage = 0;
+const PAGE_SIZE = 12;
+let hasMore = false;
+let likedSet = new Set();
+let readModalId = null;
+let searchTimeout = null;
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+async function init() {
+  loadLikedSet();
+  buildColorFilters();
+  buildColorPicker();
+  buildMoodGrid();
+  await loadMessages();
+  await updateStats();
+  window.addEventListener('scroll', () => {
+    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+  });
+}
+
+function loadLikedSet() {
+  try { likedSet = new Set(JSON.parse(localStorage.getItem('unwritten_likes') || '[]')); }
+  catch { likedSet = new Set(); }
+}
+function saveLikedSet() {
+  localStorage.setItem('unwritten_likes', JSON.stringify([...likedSet]));
+}
+
+// ═══════════════════════════════════════
+// UI BUILDERS
+// ═══════════════════════════════════════
+function buildColorFilters() {
+  const wrap = document.getElementById('colorFilters');
+  const allDot = document.createElement('div');
+  allDot.className = 'color-dot all active'; allDot.title = 'All colors';
+  allDot.onclick = () => {
+    filterColor = null;
+    document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+    allDot.classList.add('active');
+    currentPage = 0; loadMessages();
+  };
+  wrap.appendChild(allDot);
+  COLORS.forEach(c => {
+    const dot = document.createElement('div');
+    dot.className = 'color-dot'; dot.title = c.name; dot.style.background = c.hex;
+    dot.onclick = () => {
+      filterColor = c.hex; currentPage = 0;
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active'); loadMessages();
+    };
+    wrap.appendChild(dot);
+  });
+}
+
+function buildColorPicker() {
+  const grid = document.getElementById('colorPickerGrid');
+  COLORS.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch'; sw.style.background = c.hex; sw.title = c.name;
+    sw.onclick = () => {
+      selectedColor = c;
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+      document.getElementById('colorNamePreview').textContent = c.name;
+      updatePreview();
+    };
+    grid.appendChild(sw);
+  });
+}
+
+function buildMoodGrid() {
+  const grid = document.getElementById('moodGrid');
+  MOODS.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'mood-tag'; btn.textContent = m;
+    btn.onclick = () => {
+      selectedMood = m;
+      document.querySelectorAll('.mood-tag').forEach(t => t.classList.remove('selected'));
+      btn.classList.add('selected');
+    };
+    grid.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════
+// LOAD MESSAGES
+// ═══════════════════════════════════════
+async function loadMessages(reset = true) {
+  if (reset) { currentPage = 0; }
+  const grid = document.getElementById('messagesGrid');
+  if (reset) grid.innerHTML = '<div class="loading-spinner"><span></span><span></span><span></span></div>';
+
+  const params = {
+    sort: document.getElementById('sortSelect').value,
+    page: currentPage,
+    limit: PAGE_SIZE,
+  };
+  const q = document.getElementById('searchInput').value.trim();
+  if (q) params.q = q;
+  if (filterColor) params.color = filterColor;
+
+  try {
+    const data = await API.getMessages(params);
+    hasMore = data.pagination.hasMore;
+
+    if (reset) grid.innerHTML = '';
+    if (data.messages.length === 0 && reset) {
+      grid.innerHTML = '<div class="empty-state"><p>No messages here yet.</p><small>Be the first to leave one.</small></div>';
+    } else {
+      data.messages.forEach(m => grid.appendChild(createCard(m)));
+    }
+    document.getElementById('loadMoreWrap').style.display = hasMore ? 'block' : 'none';
+  } catch (e) {
+    grid.innerHTML = '<div class="empty-state"><p>Could not load messages.</p><small>Check your API connection.</small></div>';
+  }
+}
+
+async function loadMore() {
+  currentPage++;
+  await loadMessages(false);
+}
+
+function handleSearch() {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => { currentPage = 0; loadMessages(); }, 350);
+}
+
+function getTextColor(hex) {
+  if (!hex || hex.length < 7) return '#f7f5f2';
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return (0.299*r + 0.587*g + 0.114*b) / 255 > 0.55 ? '#1a1714' : '#f7f5f2';
+}
+
+function createCard(msg) {
+  const card = document.createElement('div');
+  card.className = 'msg-card';
+  const tc = getTextColor(msg.color);
+  card.innerHTML = `
+    <div class="msg-card-inner" style="background:${msg.color};color:${tc}">
+      <div>
+        <div class="msg-name">To: ${escHtml(msg.name)}</div>
+        <div class="msg-text">${escHtml(msg.text)}</div>
+        ${msg.mood ? `<div class="tag-mood" style="background:rgba(${tc==='#1a1714'?'0,0,0':'255,255,255'},0.15);color:${tc}">${msg.mood}</div>` : ''}
+      </div>
+      <div class="msg-footer">
+        <span class="msg-color-tag" style="color:${tc}">${escHtml(msg.colorName||'')}</span>
+        <button class="msg-heart ${likedSet.has(msg.id)?'liked':''}" data-id="${msg.id}" style="color:${tc}" onclick="event.stopPropagation();toggleHeart('${msg.id}',this)">
+          <span class="heart-icon">${likedSet.has(msg.id)?'♥':'♡'}</span>
+          <span class="heart-count">${msg.hearts}</span>
+        </button>
+      </div>
+    </div>`;
+  card.onclick = () => openReadModal(msg);
+  return card;
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════
+// HEARTS
+// ═══════════════════════════════════════
+async function toggleHeart(id, btn) {
+  const liked = likedSet.has(id);
+  const action = liked ? 'remove' : 'add';
+  if (liked) likedSet.delete(id); else likedSet.add(id);
+  saveLikedSet();
+  const heartIcon = btn.querySelector('.heart-icon');
+  const heartCount = btn.querySelector('.heart-count');
+  const newCount = parseInt(heartCount.textContent) + (liked ? -1 : 1);
+  heartIcon.textContent = likedSet.has(id) ? '♥' : '♡';
+  heartCount.textContent = Math.max(0, newCount);
+  btn.classList.toggle('liked', likedSet.has(id));
+  try { await API.heart(id, action); } catch {}
+  await updateStats();
+}
+
+async function toggleHeartFromModal() {
+  if (!readModalId) return;
+  const liked = likedSet.has(readModalId);
+  const action = liked ? 'remove' : 'add';
+  if (liked) likedSet.delete(readModalId); else likedSet.add(readModalId);
+  saveLikedSet();
+  const btn = document.getElementById('readModalHeart');
+  const countEl = document.getElementById('readModalHeartCount');
+  const newCount = Math.max(0, parseInt(countEl.textContent) + (liked ? -1 : 1));
+  btn.querySelector ? btn.innerHTML = `${likedSet.has(readModalId)?'♥':'♡'} <span id="readModalHeartCount">${newCount}</span>` : null;
+  document.querySelectorAll(`.msg-heart[data-id="${readModalId}"]`).forEach(b => {
+    b.querySelector('.heart-icon').textContent = likedSet.has(readModalId)?'♥':'♡';
+    b.querySelector('.heart-count').textContent = newCount;
+    b.classList.toggle('liked', likedSet.has(readModalId));
+  });
+  try { await API.heart(readModalId, action); } catch {}
+  await updateStats();
+}
+
+// ═══════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════
+async function submitMessage() {
+  const name = document.getElementById('submitName').value.trim() || 'you';
+  const text = document.getElementById('submitText').value.trim();
+  if (!text) { showToast('Write something first ✦'); return; }
+  if (!selectedColor) { showToast('Choose a color for your feeling'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await API.postMessage({ name, text, color: selectedColor.hex, colorName: selectedColor.name, mood: selectedMood });
+    closeSubmitModal();
+    await loadMessages();
+    await updateStats();
+    showToast('Your message is in the archive ✦');
+  } catch (e) {
+    showToast(e.message || 'Something went wrong');
+    btn.disabled = false; btn.textContent = 'Send it into the archive';
+  }
+}
+
+function updatePreview() {
+  const text = document.getElementById('submitText').value.trim();
+  const name = document.getElementById('submitName').value.trim() || 'you';
+  const card = document.getElementById('previewCard');
+  const col = selectedColor ? selectedColor.hex : 'var(--surface2)';
+  card.style.background = col;
+  card.style.color = selectedColor ? getTextColor(selectedColor.hex) : 'var(--text)';
+  document.getElementById('previewName').textContent = `To: ${name}`;
+  document.getElementById('previewText').textContent = text || 'Your message will appear here…';
+}
+
+function updateCharCount() {
+  const len = document.getElementById('submitText').value.length;
+  const el = document.getElementById('charCount');
+  el.textContent = `${len} / 500`;
+  el.classList.toggle('warn', len > 430);
+}
+
+// ═══════════════════════════════════════
+// READ MODAL
+// ═══════════════════════════════════════
+function openReadModal(msg) {
+  readModalId = msg.id;
+  document.getElementById('readModalColor').style.background = msg.color;
+  document.getElementById('readModalName').textContent = `To: ${msg.name}`;
+  document.getElementById('readModalText').textContent = msg.text;
+  const moodEl = document.getElementById('readModalMood');
+  if (msg.mood) { moodEl.textContent = msg.mood; moodEl.style.display='inline-block'; }
+  else moodEl.style.display='none';
+  const date = new Date(msg.createdAt);
+  document.getElementById('readModalDate').textContent = `📅 ${date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}`;
+  document.getElementById('readModalColor2').textContent = `🎨 ${msg.colorName||''}`;
+  document.getElementById('readModalHeart').innerHTML = `${likedSet.has(msg.id)?'♥':'♡'} <span id="readModalHeartCount">${msg.hearts}</span>`;
+  document.getElementById('readModal').classList.add('open');
+}
+function closeReadModal() {
+  document.getElementById('readModal').classList.remove('open');
+  readModalId = null;
+}
+
+// ═══════════════════════════════════════
+// SUBMIT MODAL
+// ═══════════════════════════════════════
+function openSubmitModal() { document.getElementById('submitModal').classList.add('open'); }
+function closeSubmitModal() {
+  document.getElementById('submitModal').classList.remove('open');
+  document.getElementById('submitText').value = '';
+  document.getElementById('submitName').value = '';
+  document.getElementById('charCount').textContent = '0 / 500';
+  selectedColor = null; selectedMood = null;
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  document.querySelectorAll('.mood-tag').forEach(t=>t.classList.remove('selected'));
+  document.getElementById('colorNamePreview').textContent = 'Choose a color that matches your feeling';
+  document.getElementById('previewCard').style.background = 'var(--surface2)';
+  document.getElementById('previewCard').style.color = 'var(--text)';
+  document.getElementById('previewName').textContent = 'To: —';
+  document.getElementById('previewText').textContent = 'Your message will appear here…';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Send it into the archive';
+}
+
+// ═══════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════
+async function updateStats() {
+  try {
+    const s = await API.stats();
+    animateNum('statTotal', s.total);
+    animateNum('statColors', s.colors);
+    animateNum('statHearts', s.hearts);
+  } catch {}
+}
+
+function animateNum(id, target) {
+  const el = document.getElementById(id);
+  const current = parseInt(el.textContent.replace(/,/g,'')) || 0;
+  const diff = target - current;
+  if (diff === 0) { el.textContent = target.toLocaleString(); return; }
+  const steps = 20; let step = 0;
+  const timer = setInterval(() => {
+    step++;
+    el.textContent = Math.round(current + diff * (step/steps)).toLocaleString();
+    if (step >= steps) { clearInterval(timer); el.textContent = target.toLocaleString(); }
+  }, 20);
+}
+
+// ═══════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════
+const themeBtn = document.getElementById('themeToggle');
+function setTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('unwritten_theme', t);
+}
+themeBtn.onclick = () => setTheme(document.documentElement.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+const savedTheme = localStorage.getItem('unwritten_theme') || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+setTheme(savedTheme);
+
+// ═══════════════════════════════════════
+// TOAST + ESC
+// ═══════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeSubmitModal(); closeReadModal(); }
+});
+
+init();
+</script>
+</body>
+</html>
