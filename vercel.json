@@ -12,16 +12,16 @@
   ],
   "rewrites": [
     {
-      "source": "/api/messages/:id",
-      "destination": "/api/messages/[id].js"
-    },
-    {
       "source": "/api/messages",
       "destination": "/api/messages.js"
     },
     {
       "source": "/api/stats",
       "destination": "/api/stats.js"
+    },
+    {
+      "source": "/api/messages/:id",
+      "destination": "/api/messages/[id].js"
     },
     {
       "source": "/((?!api/).*)",
