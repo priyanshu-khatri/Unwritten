@@ -1,4 +1,6 @@
-import { SEED_MESSAGES } from './_seed.js'; // We will create this helper file next
+import { SEED_MESSAGES } from './_seed.js';
+import { Redis } from '@upstash/redis';
+const kv = Redis.fromEnv(); // We will create this helper file next
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
