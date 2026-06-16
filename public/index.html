@@ -401,132 +401,165 @@
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <p class="hero-eyebrow">An anonymous archive of unsent words</p>
-  <h1>The things we never <em>dared</em> to say</h1>
-  <p>A collection of messages written but never sent — to first loves, lost friends, the ones who stayed too long, and the ones who left too soon. What color is your unspoken feeling?</p>
-  <div class="hero-actions">
-    <button class="btn btn-primary" onclick="openSubmitModal()">Leave a message</button>
-    <button class="btn btn-ghost" onclick="document.getElementById('messages').scrollIntoView({behavior:'smooth'})">Read the archive ↓</button>
+ <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a0a0a 0%, #2d0a0a 30%, #1a0505 60%, #0d0000 100%);
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+ 
+    /* Glowing background blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.35;
+      animation: pulse 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+    .blob1 { width: 420px; height: 420px; background: #e53935; top: -100px; left: -100px; animation-delay: 0s; }
+    .blob2 { width: 340px; height: 340px; background: #b71c1c; bottom: -80px; right: -80px; animation-delay: 1.5s; }
+    .blob3 { width: 220px; height: 220px; background: #ff1744; top: 40%; left: 65%; animation-delay: 0.8s; }
+ 
+    @keyframes pulse {
+      from { opacity: 0.25; transform: scale(1); }
+      to   { opacity: 0.48; transform: scale(1.12); }
+    }
+ 
+    /* Glass card */
+    .glass-card {
+      position: relative;
+      z-index: 10;
+      background: rgba(220, 30, 30, 0.18);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1.5px solid rgba(255, 100, 100, 0.32);
+      border-radius: 28px;
+      padding: 60px 64px 52px;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+      box-shadow:
+        0 8px 48px rgba(180, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 180, 180, 0.18);
+    }
+ 
+    /* Triangle icon circle */
+    .icon-ring {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 32px;
+      background: rgba(255, 60, 60, 0.2);
+      border: 1.5px solid rgba(255, 120, 120, 0.38);
+      border-radius: 50%;
+      animation: glow 2.5s ease-in-out infinite alternate;
+    }
+ 
+    @keyframes glow {
+      from { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0); }
+      to   { box-shadow: 0 0 0 14px rgba(255, 50, 50, 0.16); }
+    }
+ 
+    .icon-ring svg { display: block; }
+ 
+    /* Text */
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: -0.4px;
+    }
+ 
+    p {
+      font-size: 16px;
+      color: rgba(255, 200, 200, 0.82);
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+ 
+    /* Progress bar */
+    .bar-track {
+      background: rgba(255, 255, 255, 0.10);
+      border-radius: 100px;
+      height: 7px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+ 
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff5252, #ff1744);
+      border-radius: 100px;
+      animation: progress 2.6s ease-in-out infinite;
+    }
+ 
+    @keyframes progress {
+      0%   { width: 18%; }
+      55%  { width: 80%; }
+      100% { width: 18%; }
+    }
+ 
+    .bar-label {
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255, 170, 170, 0.60);
+    }
+ 
+    /* Animated dots */
+    .dots::after {
+      content: '';
+      animation: dots 1.6s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%   { content: ''; }
+      25%  { content: '.'; }
+      50%  { content: '..'; }
+      75%  { content: '...'; }
+      100% { content: ''; }
+    }
+  </style>
+</head>
+<body>
+ 
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+ 
+  <div class="glass-card">
+ 
+    <div class="icon-ring">
+      <svg width="46" height="42" viewBox="0 0 46 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M23 4L43 39H3L23 4Z" fill="rgba(255,80,80,0.22)" stroke="#ff5252" stroke-width="2.4" stroke-linejoin="round"/>
+        <text x="23" y="32" text-anchor="middle" font-size="20" font-weight="700" fill="#ffffff" font-family="Inter, sans-serif">!</text>
+      </svg>
+    </div>
+ 
+    <h1>Website is in Progress</h1>
+    <p>We're working hard to bring you something amazing.<br>Please wait for some time<span class="dots"></span></p>
+ 
+    <div class="bar-track">
+      <div class="bar-fill"></div>
+    </div>
+    <div class="bar-label">Under Construction</div>
+ 
   </div>
-</section>
-
-<!-- STATS -->
-<div class="stats-bar">
-  <div class="stat">
-    <span class="stat-num" id="statTotal">—</span>
-    <span class="stat-label">messages</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num" id="statColors">—</span>
-    <span class="stat-label">colors</span>
-  </div>
-  <div class="stat">
-    <span class="stat-num" id="statHearts">—</span>
-    <span class="stat-label">hearts given</span>
-  </div>
-</div>
-
-<!-- FILTER -->
-<section id="messages" class="filter-section">
-  <div class="filter-row">
-    <div class="search-wrap">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="search-input" type="text" id="searchInput" placeholder="Search messages…" oninput="handleSearch()">
-    </div>
-    <select class="sort-select" id="sortSelect" onchange="loadMessages()">
-      <option value="newest">Newest first</option>
-      <option value="oldest">Oldest first</option>
-      <option value="most-loved">Most loved</option>
-      <option value="random">Random</option>
-    </select>
-  </div>
-  <div class="filter-row">
-    <span class="color-filter-label">Filter by color:</span>
-    <div class="color-filters" id="colorFilters"></div>
-  </div>
-</section>
-
-<!-- MESSAGES GRID -->
-<div class="messages-grid" id="messagesGrid">
-  <div class="loading-spinner"><span></span><span></span><span></span></div>
-</div>
-<div class="load-more-wrap" id="loadMoreWrap" style="display:none">
-  <button class="btn btn-ghost" onclick="loadMore()">Load more messages</button>
-</div>
-
-<!-- ABOUT -->
-<section class="about-section">
-  <h2>About Unwritten</h2>
-  <p>Every day, millions of messages are typed and deleted, feelings that never find their way. Unwritten is an anonymous archive for these unsent words — the confessions, apologies, love letters, and goodbyes that lived only on a screen. Submit yours anonymously. Read others. Feel less alone.</p>
-</section>
-
-<footer>
-  Unwritten — A space for unspoken words &nbsp;·&nbsp; Anonymous, always
-</footer>
-
-<!-- SUBMIT MODAL -->
-<div class="modal-overlay" id="submitModal" onclick="if(event.target===this)closeSubmitModal()">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 class="modal-title">Share the <em>unsent</em></h2>
-      <button class="modal-close" onclick="closeSubmitModal()">✕</button>
-    </div>
-    <div class="form-group">
-      <label class="form-label">To whom?</label>
-      <input class="form-input" type="text" id="submitName" placeholder="e.g. You, M, my first love…" maxlength="40">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Your message</label>
-      <textarea class="form-textarea" id="submitText" placeholder="What did you never say?" maxlength="500" oninput="updatePreview(); updateCharCount()"></textarea>
-      <div class="char-count" id="charCount">0 / 500</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">What color is this feeling?</label>
-      <div class="color-picker-grid" id="colorPickerGrid"></div>
-      <div class="color-name-preview" id="colorNamePreview">Choose a color that matches your feeling</div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Mood</label>
-      <div class="mood-select-grid" id="moodGrid"></div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Preview</label>
-      <div class="preview-card" id="previewCard">
-        <div class="preview-name" id="previewName">To: —</div>
-        <div class="preview-text" id="previewText">Your message will appear here…</div>
-      </div>
-    </div>
-    <button class="submit-btn" id="submitBtn" onclick="submitMessage()">Send it into the archive</button>
-  </div>
-</div>
-
-<!-- READ MODAL -->
-<div class="modal-overlay" id="readModal" onclick="if(event.target===this)closeReadModal()">
-  <div class="modal read-modal">
-    <div class="modal-header" style="justify-content:flex-end">
-      <button class="modal-close" onclick="closeReadModal()">✕</button>
-    </div>
-    <div class="read-modal-color" id="readModalColor"></div>
-    <p class="read-modal-name" id="readModalName"></p>
-    <p class="read-modal-text" id="readModalText"></p>
-    <div style="margin-bottom:1rem;text-align:center">
-      <span id="readModalMood" class="tag-mood" style="display:none"></span>
-    </div>
-    <div class="read-modal-meta">
-      <span id="readModalDate">📅</span>
-      <span id="readModalColor2">🎨</span>
-    </div>
-    <div style="text-align:center;margin-top:1.5rem">
-      <button class="btn btn-ghost" id="readModalHeart" onclick="toggleHeartFromModal()">♡ <span id="readModalHeartCount">0</span></button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
-
+ 
+</body>
+</html>
+ 
+<!-- ?
 <script>
 // ═══════════════════════════════════════
 // API CLIENT — talks to /api/* endpoints
